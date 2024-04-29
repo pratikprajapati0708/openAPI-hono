@@ -1,15 +1,10 @@
-import { Hono } from 'hono'
-import { z } from '@hono/zod-openapi'
-
-const app = new Hono()
-
-//The inputs from the user on the route
-
-import { createRoute } from '@hono/zod-openapi'
+import { createRoute,OpenAPIHono } from '@hono/zod-openapi'
 import { ParamsSchema } from './inputs'
 import { UserSchema } from './outputs'
+import { Hono } from 'hono'
 
-const route = createRoute({
+const app = new OpenAPIHono()
+const userroute = createRoute({
   method: 'get',
   path: '/users/{id}',
   request: {
@@ -26,7 +21,23 @@ const route = createRoute({
     },
   },
 })
+app.openapi(userroute, (c) => {
+  const { id } = c.req.valid('param')
+  return c.json({
+    id,
+    age: 20,
+    name: 'Ultra-man',
+  })
+})
 
+// The OpenAPI documentation will be available at /doc
+app.doc('/doc', {
+  openapi: '3.0.0',
+  info: {
+    version: '1.0.0',
+    title: 'My API',
+  },
+})
 
 
 export default app
