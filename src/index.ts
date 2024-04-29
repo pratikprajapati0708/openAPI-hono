@@ -5,28 +5,28 @@ const app = new Hono()
 
 //The inputs from the user on the route
 
-const ParamsSchema = z.object({
-  id : z.string().min(1).max(10).openapi({
-    param:{
-      name : 'id',
-      in: 'path'
+import { createRoute } from '@hono/zod-openapi'
+import { ParamsSchema } from './inputs'
+import { UserSchema } from './outputs'
+
+const route = createRoute({
+  method: 'get',
+  path: '/users/{id}',
+  request: {
+    params: ParamsSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: UserSchema,
+        },
+      },
+      description: 'Get the user details',
     },
-    example : '123'
-  })
+  },
 })
 
-//the output of the route
-const UserSchema = z.object({
-  name : z.string().min(1).max(10).openapi({
-    example : "John"
-  }),
-  age : z.number().int().openapi({
-    example : 12
-  }),
-  id : z.string().min(1).max(10).openapi({
-    example : '24'
-  })
-})
 
 
 export default app
